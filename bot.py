@@ -20,6 +20,14 @@ CREATE TABLE IF NOT EXISTS users (
     ref_by INTEGER
 )
 """)
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS points (
+    user_id INTEGER PRIMARY KEY,
+    point INTEGER DEFAULT 0
+)
+""")
+
 conn.commit()
 
 # 🌍 پلن‌ها
@@ -63,74 +71,84 @@ pending_users = set()
 
 # 🎛 منوی اصلی
 main_markup = ReplyKeyboardMarkup(
-    [["🛒 خرید VPN", "🆘 پشتیبانی"],
-     ["📄 درباره ما"]],
+    [["🛒 خرید VPN", "🧪 تست VPN"],
+     ["🆘 پشتیبانی", "📄 درباره ما"],
+     ["👥 پنل رفرال"]],
     resize_keyboard=True
 )
 
-# ➕ ثبت کاربر
+# ➕ کاربر
 def add_user(user_id):
     cursor.execute("SELECT 1 FROM users WHERE user_id=?", (user_id,))
     if not cursor.fetchone():
         cursor.execute("INSERT INTO users (user_id) VALUES (?)", (user_id,))
         conn.commit()
 
-# 🚀 استارت
+# 📊 رفرال
+def get_ref_count(user_id):
+    cursor.execute("SELECT COUNT(*) FROM users WHERE ref_by=?", (user_id,))
+    return cursor.fetchone()[0]
+
+def get_points(user_id):
+    cursor.execute("SELECT point FROM points WHERE user_id=?", (user_id,))
+    row = cursor.fetchone()
+    return row[0] if row else 0
+
+# 🚀 start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.chat_id
+    args = context.args
+
     add_user(user_id)
 
+    # ثبت رفرال
+    if args:
+        ref_id = int(args[0])
+        if ref_id != user_id:
+            cursor.execute("SELECT ref_by FROM users WHERE user_id=?", (user_id,))
+            row = cursor.fetchone()
+
+            if not row or row[0] is None:
+                cursor.execute("UPDATE users SET ref_by=? WHERE user_id=?", (ref_id, user_id))
+
+                cursor.execute(
+                    "INSERT INTO points(user_id, point) VALUES(?, 1) "
+                    "ON CONFLICT(user_id) DO UPDATE SET point = point + 1",
+                    (ref_id,)
+                )
+                conn.commit()
+
+    bot_username = context.bot.username
+    link = f"https://t.me/{bot_username}?start={user_id}"
+
     await update.message.reply_text(
-        "👋 خوش اومدی به ربات VPN\n\nیکی از گزینه‌ها رو انتخاب کن 👇",
+        "👋 خوش اومدی به ربات VPN\n\n"
+        f"🔗 لینک دعوت تو:\n{link}\n\n"
+        "💰 هر دعوت = 1 امتیاز",
         reply_markup=main_markup
     )
 
-# 🌍 منوی کشور
-def country_menu():
-    return ReplyKeyboardMarkup(
-        [[c] for c in COUNTRIES] + [["🔙 برگشت"]],
-        resize_keyboard=True
-    )
-
-# 📦 منوی پلن
-def plan_menu(country):
-    return ReplyKeyboardMarkup(
-        [[p] for p in PLANS[country].keys()] + [["🔙 برگشت"]],
-        resize_keyboard=True
-    )
-
-# 🧠 مدیریت پیام‌ها
+# 🧠 هندل پیام‌ها
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.chat_id
     text = update.message.text
 
     # خرید
     if text == "🛒 خرید VPN":
+        buttons = [[c] for c in COUNTRIES]
         await update.message.reply_text(
             "🌍 کشور رو انتخاب کن:",
-            reply_markup=country_menu()
+            reply_markup=ReplyKeyboardMarkup(buttons, resize_keyboard=True)
         )
-
-    # برگشت به منوی اصلی
-    elif text == "🔙 برگشت" and user_id not in user_country:
-        await update.message.reply_text("🏠 برگشتی به منو", reply_markup=main_markup)
 
     # انتخاب کشور
     elif text in PLANS:
         user_country[user_id] = text
 
+        buttons = [[p] for p in PLANS[text].keys()]
         await update.message.reply_text(
             "📦 پلن رو انتخاب کن:",
-            reply_markup=plan_menu(text)
-        )
-
-    # برگشت از پلن به کشور
-    elif text == "🔙 برگشت" and user_id in user_country:
-        user_country.pop(user_id, None)
-
-        await update.message.reply_text(
-            "🌍 کشور رو انتخاب کن:",
-            reply_markup=country_menu()
+            reply_markup=ReplyKeyboardMarkup(buttons, resize_keyboard=True)
         )
 
     # انتخاب پلن
@@ -146,30 +164,55 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"📦 پلن: {text}\n"
             f"💰 قیمت: {price:,} تومان\n\n"
             "💳 کارت:\n6219-XXXX-XXXX-XXXX\n\n"
-            "📸 فیش پرداخت رو بفرست"
+            "📸 فیش رو بفرست"
+        )
+
+    # تست VPN
+    elif text == "🧪 تست VPN":
+        await update.message.reply_text(
+            "🧪 درخواست تست ثبت شد\n⏳ منتظر ادمین باشید"
+        )
+
+        await context.bot.send_message(
+            chat_id=ADMIN_ID,
+            text=f"🧪 درخواست تست VPN\n👤 {user_id}\n\nvpn_test:{user_id}|TEST_LINK"
         )
 
     # پشتیبانی
     elif text == "🆘 پشتیبانی":
         await update.message.reply_text(
-            f"📩 ارتباط مستقیم با پشتیبانی 👇\nhttps://t.me/{SUPPORT_USERNAME}"
+            f"📩 پشتیبانی:\nhttps://t.me/{SUPPORT_USERNAME}"
         )
 
     # درباره ما
     elif text == "📄 درباره ما":
         await update.message.reply_text(
             "📄 درباره ما\n\n"
-            "این ربات برای فروش VPN پرسرعت ساخته شده 🚀\n\n"
-            "✔ سرورهای متنوع\n"
+            "🔥 فروش VPN پرسرعت\n"
+            "✔ سرورهای آلمان، ترکیه، فلاند\n"
             "✔ پینگ پایین\n"
-            "✔ پشتیبانی سریع\n\n"
-            "🙏 ممنون از انتخاب شما"
+            "✔ پشتیبانی 24/7"
+        )
+
+    # پنل رفرال
+    elif text == "👥 پنل رفرال":
+        count = get_ref_count(user_id)
+        points = get_points(user_id)
+
+        bot_username = context.bot.username
+        link = f"https://t.me/{bot_username}?start={user_id}"
+
+        await update.message.reply_text(
+            "📊 پنل رفرال\n\n"
+            f"👥 دعوت‌ها: {count}\n"
+            f"⭐ امتیاز: {points}\n\n"
+            f"🔗 لینک:\n{link}"
         )
 
     else:
         await update.message.reply_text("👇 از دکمه‌ها استفاده کن")
 
-# 📸 دریافت فیش
+# 📸 فیش
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.chat_id
 
@@ -179,40 +222,35 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_photo(
             chat_id=ADMIN_ID,
             photo=photo,
-            caption=(
-                f"💳 فیش جدید\n"
-                f"👤 {user_id}\n"
-                f"🌍 {user_country.get(user_id)}\n"
-                f"📦 {user_plan.get(user_id)}\n\n"
-                f"vpn:{user_id}|YOUR_VPN_LINK"
-            )
+            caption=f"💳 فیش جدید\n👤 {user_id}\nvpn:{user_id}|LINK"
         )
 
-        await update.message.reply_text("✅ فیش ارسال شد")
+        await update.message.reply_text("✅ ارسال شد")
 
-    else:
-        await update.message.reply_text("اول خرید کن 👇")
-
-# 👨‍💻 پنل ادمین
+# 👨‍💻 ادمین
 async def admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.chat_id != ADMIN_ID:
         return
 
     text = update.message.text
 
+    # VPN اصلی
     if text.startswith("vpn:"):
-        try:
-            uid, link = text.replace("vpn:", "").split("|")
+        uid, link = text.replace("vpn:", "").split("|")
 
-            await context.bot.send_message(
-                chat_id=int(uid),
-                text=f"🎉 VPN شما آماده شد:\n\n🔐 {link}"
-            )
+        await context.bot.send_message(
+            chat_id=int(uid),
+            text=f"🎉 VPN شما:\n{link}"
+        )
 
-            await update.message.reply_text("✅ ارسال شد")
+    # VPN تست
+    elif text.startswith("vpn_test:"):
+        uid, link = text.replace("vpn_test:", "").split("|")
 
-        except:
-            await update.message.reply_text("❌ فرمت اشتباهه")
+        await context.bot.send_message(
+            chat_id=int(uid),
+            text=f"🧪 VPN تست شما:\n{link}\n⏳ محدود"
+        )
 
 # 🤖 اجرا
 app = ApplicationBuilder().token(TOKEN).build()
