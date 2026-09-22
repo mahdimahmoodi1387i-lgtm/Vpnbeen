@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>♡ My Princess ♡</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{font-family:Tahoma,"Segoe UI",sans-serif;color:#fff;background:#310a1b}
+.bg{position:fixed;inset:0;background:
+radial-gradient(circle at 15% 18%,#ffb5c955,transparent 26%),
+radial-gradient(circle at 85% 22%,#ff769055,transparent 27%),
+linear-gradient(135deg,#3b0b20,#922a51 50%,#31091a)}
+.bg:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 28%,#17030b99 100%)}
+.header{position:fixed;z-index:20;top:18px;left:22px;right:22px;display:flex;justify-content:space-between;font-weight:700}
+.screen{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:65px 16px 25px}
+.screen.active{display:flex;animation:fade .45s ease}
+@keyframes fade{from{opacity:0;transform:scale(.985)}to{opacity:1}}
+.card{width:min(94vw,820px);text-align:center;padding:28px 18px;border-radius:30px;background:#50132d70;border:1px solid #fff3;backdrop-filter:blur(8px);box-shadow:0 25px 80px #15020b80}
+h1{font-size:clamp(30px,6vw,52px);margin:0 0 12px;text-shadow:0 4px 22px #ff5f91aa}
+h2{font-size:clamp(25px,5vw,38px);margin:8px 0 12px}.sub{font-size:18px;line-height:2}.line{width:330px;max-width:80%;height:2px;margin:12px auto 25px;background:linear-gradient(90deg,transparent,#fff,transparent)}
+.line:after{content:"♡";position:relative;display:block;width:25px;margin:-13px auto 0;background:#681d3c;font-size:21px}
+.btn{border:1px solid #fff4;color:#fff;background:linear-gradient(135deg,#ff709e,#dd3d70);padding:14px 32px;border-radius:999px;min-width:145px;font:700 18px Tahoma;cursor:pointer;box-shadow:0 10px 25px #17030b66;transition:.2s}
+.btn:hover{transform:translateY(-3px)}.buttons{display:flex;justify-content:center;gap:15px;flex-wrap:wrap}
+
+/* REALISTIC-FEEL BOX: lid is a separate flap that rotates around a hinge, not a flat overlay */
+.box-area{height:390px;position:relative;display:flex;align-items:flex-end;justify-content:center}
+.tap{position:absolute;top:0;left:50%;transform:translateX(-50%);font-size:20px;font-weight:800;animation:bob 1.3s infinite;white-space:nowrap}
+@keyframes bob{50%{transform:translateX(-50%) translateY(-7px)}}
+.box{position:relative;width:300px;height:260px;cursor:pointer;filter:drop-shadow(0 24px 25px #14030a99);transition:.2s}
+.box:hover{transform:scale(1.015)}
+.base{position:absolute;left:38px;bottom:15px;width:224px;height:155px;border-radius:14px 14px 35px 35px;background:linear-gradient(145deg,#f49bb5,#bd285c);border:2px solid #ffc5d5;z-index:2;overflow:hidden}
+.base:before{content:"";position:absolute;left:50%;top:0;bottom:0;width:24px;transform:translateX(-50%);background:#ffe1eb66}
+.base:after{content:"";position:absolute;inset:8px;border:1px solid #fff3;border-radius:10px 10px 28px 28px}
+.lid{position:absolute;z-index:7;left:27px;top:54px;width:246px;height:104px;border-radius:123px 123px 28px 28px;background:linear-gradient(145deg,#ffabc1,#c62f63);border:2px solid #ffd0dc;transform-origin:50% 100%;transition:1s cubic-bezier(.18,.82,.2,1);box-shadow:inset 0 -10px 20px #8c194355}
+.lid:before{content:"";position:absolute;left:50%;top:10px;width:28px;height:85px;transform:translateX(-50%);background:#ffe1eb55;border-radius:10px}
+.ribbon{position:absolute;z-index:8;left:50%;top:59px;transform:translateX(-50%);width:25px;height:151px;background:#ffe1e999;border-left:1px solid #fff8;border-right:1px solid #fff8}
+.lock{position:absolute;z-index:10;left:50%;top:79px;transform:translateX(-50%);font-size:30px;text-shadow:0 2px 8px #74183c}
+.box.open .lid{transform:rotateX(105deg) translateY(-34px)}
+.box.open .lock{opacity:0;transition:.2s}
+.ring-sticker{position:absolute;z-index:5;left:50%;bottom:73px;width:150px;transform:translateX(-50%) scale(.55);opacity:0;transition:1s .28s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 5px 12px #fff5)}
+.box.open .ring-sticker{transform:translateX(-50%) translateY(-5px) scale(1);opacity:1}
+.proposal{display:none}.opened .proposal{display:block;animation:fade .5s}
+.no-row{height:100px;display:flex;justify-content:center;align-items:flex-start;gap:14px}
+.note{font-size:13px;color:#ffd4e1}
+.grid{width:min(600px,94vw);display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px auto}
+.choice{padding:20px 10px;border-radius:20px;border:1px solid #fff4;background:#ffffff12;cursor:pointer;font-size:18px;font-weight:800}
+.choice.selected{background:linear-gradient(135deg,#ff709e,#dc3d70);border-color:#ffc2d2;transform:scale(1.025)}
+.form{width:min(520px,94vw);margin:auto;text-align:right}.form label{display:block;margin:12px 3px 6px;font-weight:800}
+input{width:100%;padding:14px;border:1px solid #fff5;border-radius:15px;background:#ffffff12;color:#fff;font:700 16px Tahoma;outline:0}
+.err{min-height:22px;font-size:13px;color:#ffd3df;text-align:center}
+.heart{position:fixed;z-index:40;bottom:-40px;animation:up 6s linear forwards;pointer-events:none}
+@keyframes up{0%{opacity:0;transform:translateY(0)}15%{opacity:.8}100%{opacity:0;transform:translateY(-115vh) rotate(35deg)}}
+@media(max-width:560px){.box-area{height:340px}.box{transform:scale(.82)}.box:hover{transform:scale(.82)}.card{padding:24px 10px}}
+</style>
+</head>
+<body>
+<div class="bg"></div><div class="header"><span>♡ My Princess ♡</span><span>♫ ♡</span></div><div id="hearts"></div><audio id="bgMusic" src="assets/music.mp3" preload="auto"></audio>
+
+<section class="screen active" id="s1"><div class="card">
+<h1>♡ حالت چطوره پرنسسم؟ ♡</h1><div class="line"></div>
+<p class="sub">امروز پرنسس من چه حسی داره؟ 💗</p>
+<div class="buttons"><button class="btn" onclick="startMusicAndGo()">خوبم 💕</button><button class="btn" onclick="startMusicAndGo()">عالیم 💖</button></div>
+</div></section>
+
+<section class="screen" id="s2"><div class="card" id="boxCard">
+<div class="box-area">
+<div class="tap">♡ روی این جعبه بزن ♡</div>
+<div class="box" id="box" onclick="openBox()">
+<div class="lid"></div><div class="base"></div><div class="ribbon"></div><div class="lock">♥</div>
+<img class="ring-sticker" src="assets/ring-sticker.svg" alt="انگشتر نگین دار">
+</div></div>
+<p id="boxText" class="sub">بزن روی جعبه تا باز بشه ✨</p>
+<div class="proposal" id="proposal">
+<h2>با من ازدواج می‌کنی؟ 💍❤️</h2><div class="line"></div>
+<div class="no-row"><button class="btn" onclick="yes()">بله ❤️</button><button class="btn no-btn" id="no" onclick="nope()">نه</button></div>
+<div class="note">گزینه «نه» هی کوچیک‌تر میشه 😂💕</div>
+</div>
+</div></section>
+
+<section class="screen" id="s3"><div class="card">
+<h2>پس بریم سراغ دیت 🥹❤️</h2><p class="sub">دوست داری دیت چی بریم؟</p>
+<div class="grid">
+<div class="choice" onclick="pick(this)" data-v="کباب 🍢">🍢<br>کباب</div>
+<div class="choice" onclick="pick(this)" data-v="پاستا 🍝">🍝<br>پاستا</div>
+<div class="choice" onclick="pick(this)" data-v="پیتزا 🍕">🍕<br>پیتزا</div>
+<div class="choice" onclick="pick(this)" data-v="کافه ☕">☕<br>کافه</div>
+</div>
+<button class="btn" onclick="go(4)">انتخاب کردم 💗</button>
+</div></section>
+
+<section class="screen" id="s4"><div class="card">
+<h2>تاریخ و ساعت دیت رو انتخاب کن ⏰💕</h2>
+<div class="form">
+<label>تاریخ</label><input id="date" type="date">
+<label>ساعت</label><input id="time" type="time">
+</div><p id="err" class="err"></p>
+<button class="btn" onclick="submitDate()">ثبت قرار ❤️</button>
+</div></section>
+
+<section class="screen" id="s5"><div class="card">
+<div style="font-size:70px">💍💗</div><h1>قرارمون ثبت شد!</h1>
+<p id="summary" class="sub" style="font-size:23px;font-weight:800"></p>
+<p class="sub">حالا دیگه منتظر دیت با پرنسس منم 😭❤️</p>
+</div></section>
+
+<script>
+let selected="", noClicks=0;
+function startMusicAndGo(){
+ const m=document.getElementById("bgMusic");
+ try{m.currentTime=39;}catch(_){}
+ m.play().catch(()=>{});
+ go(2);
+}
+function go(n){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById("s"+n).classList.add("active")}
+function openBox(){
+ const b=document.getElementById("box"); if(b.classList.contains("open"))return;
+ b.classList.add("open"); document.getElementById("boxCard").classList.add("opened");
+ document.getElementById("boxText").textContent="وای... یه انگشتر برای پرنسسم 💍✨";
+}
+function nope(){
+ noClicks++;
+ const b=document.getElementById("no");
+ if(noClicks<3)b.classList.add("shrink");
+ else b.classList.add("gone");
+}
+function yes(){go(3)}
+function pick(el){document.querySelectorAll(".choice").forEach(x=>x.classList.remove("selected"));el.classList.add("selected");selected=el.dataset.v}
+async function submitDate(){
+ const d=document.getElementById("date").value,t=document.getElementById("time").value,e=document.getElementById("err");
+ if(!selected||!d||!t){e.textContent="نوع دیت، تاریخ و ساعت رو کامل انتخاب کن 💗";return}
+ try{await fetch("/api/send",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({dateType:selected,date:d,time:t})})}catch(_){}
+ document.getElementById("summary").textContent=selected+" — "+d+" — ساعت "+t;go(5)
+}
+setInterval(()=>{const h=document.createElement("div");h.className="heart";h.textContent=["♥","♡","💗","💖"][Math.floor(Math.random()*4)];h.style.left=Math.random()*100+"vw";h.style.fontSize=(16+Math.random()*20)+"px";h.style.animationDuration=(4+Math.random()*4)+"s";document.getElementById("hearts").appendChild(h);setTimeout(()=>h.remove(),9000)},500);
+</script>
+</body></html>

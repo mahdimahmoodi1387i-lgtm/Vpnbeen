@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="220" viewBox="0 0 260 220">
+<defs>
+ <linearGradient id="gold" x1="0" x2="1"><stop stop-color="#fff6d5"/><stop offset=".45" stop-color="#f6c95e"/><stop offset="1" stop-color="#fff0ad"/></linearGradient>
+ <linearGradient id="gem" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset=".35" stop-color="#ffe9f4"/><stop offset=".7" stop-color="#ffb6d2"/><stop offset="1" stop-color="#fff"/></linearGradient>
+ <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#7b173f" flood-opacity=".35"/></filter>
+</defs>
+<g filter="url(#shadow)">
+ <path d="M55 130 C58 195 202 195 205 130" fill="none" stroke="url(#gold)" stroke-width="18" stroke-linecap="round"/>
+ <path d="M55 130 C58 195 202 195 205 130" fill="none" stroke="#fff8d9" stroke-width="5" stroke-linecap="round" opacity=".9"/>
+ <path d="M77 137 L91 83 L169 83 L183 137" fill="none" stroke="url(#gold)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+ <path d="M130 20 L157 47 L148 79 L112 79 L103 47 Z" fill="url(#gem)" stroke="#fff" stroke-width="5"/>
+ <path d="M103 47 L130 54 L157 47 M112 79 L130 54 L148 79 M130 20 L130 54" fill="none" stroke="#f39aba" stroke-width="3" opacity=".9"/>
+ <circle cx="111" cy="36" r="5" fill="#fff"/>
+</g>
+</svg>
